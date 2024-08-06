@@ -17,7 +17,7 @@ from apscheduler.schedulers.background  import BackgroundScheduler
 
 PAUSE_TIME = 60*2
 CHECKING_TIME = 60*20#every 15minut
-NIGHT_INTERVAL = 6*3600  # 4 hours in seconds
+NIGHT_INTERVAL = 6*3600  # 6 hours in seconds
 HOW_MANY_SCROLLS = 3 #how many scrolls on facebook to read posts
 INTERNET_CHECK_INTERVAL = 60*10  # 5 minutes in seconds
 
