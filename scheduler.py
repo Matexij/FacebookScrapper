@@ -6,6 +6,7 @@ import random
 import signal
 import time
 import sys
+from dotenv import load_dotenv
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -19,6 +20,11 @@ CHECKING_TIME = 60*20#every 15minut
 NIGHT_INTERVAL = 6*3600  # 4 hours in seconds
 HOW_MANY_SCROLLS = 3 #how many scrolls on facebook to read posts
 INTERNET_CHECK_INTERVAL = 60*10  # 5 minutes in seconds
+
+load_dotenv()  # Load environment variables from .env file
+
+username = os.getenv('SCRAPER_USERNAME')
+password = os.getenv('SCRAPER_PASSWORD')
 
 scheduler = BackgroundScheduler()
 options = webdriver.ChromeOptions()
@@ -222,12 +228,12 @@ def shutdown_scheduler(signum, frame):
 
 
 # Function to log into Facebook
-def login(email, password):
+def login():
     print('Login')
     driver.get('https://www.facebook.com')
     email_input = driver.find_element(By.ID, 'email')
     password_input = driver.find_element(By.ID, 'pass')
-    email_input.send_keys(email)
+    email_input.send_keys(username)
     password_input.send_keys(password)
     password_input.send_keys(Keys.RETURN)
     time.sleep(5)  # Wait for the page to load
@@ -346,7 +352,7 @@ def scrape_posts(howmuch):
 if __name__ == '__main__':
     print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
     time.sleep(5)  
-    login('xxxxx', 'xxxxx') #add login data
+    login()
     time.sleep(5) 
     
     tick(8)  # Schedule the first tick

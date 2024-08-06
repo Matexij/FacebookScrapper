@@ -18,5 +18,6 @@
 > http://localhost:8000/index.html
 
 ## note
+* login info stored in the file **.env**
 * running with Selenium
-* php rotchet
+* php rotchet for websocket
