@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posts</title>
+    <style>
+        .post {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .btn {
+            margin-left: 10px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .btn-red {
+            background-color: red;
+            color: white;
+        }
+        .btn-green {
+            background-color: green;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Real Time Posts</h1>
+    <div id="posts-container"></div>
+
+    <script>
+        const postsContainer = document.getElementById('posts-container');
+        const ws = new WebSocket('ws://localhost:8080');
+
+        ws.onmessage = function(event) {
+            const posts = JSON.parse(event.data);
+            posts.forEach(post => {
+                if (!post.deleted) {
+                    const postDiv = document.createElement('div');
+                    postDiv.className = 'post';
+                    postDiv.id = `post-${post.id}`;
+                    postDiv.innerHTML = `
+                        <p>${post.text}</p>
+                        <button class="btn btn-red" onclick="removePost('${post.id}')">X</button>
+                        <button class="btn btn-green" onclick="answerPost('${post.id}')">Answer</button>
+                    `;
+                    postsContainer.appendChild(postDiv);
+                }
+            });
+        };
+
+        function removePost(id) {
+            fetch('/remove_post.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const postElement = document.getElementById(`post-${id}`);
+                    if (postElement) {
+                        postElement.style.display = 'none'; // Hide the post
+                    }
+                } else {
+                    console.error('Failed to remove post:', data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function answerPost(id) {
+            fetch('/handle_post.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const postElement = document.getElementById(`post-${id}`);
+                    if (postElement) {
+                        postElement.style.display = 'none'; // Hide the post
+                    }
+                    console.log('Task added successfully');
+                } else {
+                    console.error('Failed to add task:', data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function fetchPosts() {
+                console.log('load new posts')
+            fetch('/load_posts.php')
+                .then(response => response)
+                .then(() => {
+                    console.log("Initial posts loaded");
+                });
+        }
+        // Fetch initial posts
+        fetchPosts();
+    </script>
+</body>
+</html>
